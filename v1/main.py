@@ -6,7 +6,7 @@ from pygame.locals import *
 from pydub import AudioSegment
 from pydub.playback import play
 import serial
-
+import time
 ## serial config ##
 DEVICE_NAME = ''
 serial_port = None
@@ -15,6 +15,8 @@ if len(sys.argv) > 1:
         DEVICE_NAME = 'COM3'
     if sys.argv[1] == 'mac':
         DEVICE_NAME = '/dev/tty.usbmodem11101'
+    if sys.argv[1] == 'linux':
+        DEVICE_NAME = '/dev/ttyACM0'
 if DEVICE_NAME != '':
     serial_port =  serial.Serial(DEVICE_NAME, 9600)
 
@@ -147,12 +149,15 @@ def ard2que(ard):
 
 last_serial_data = [0 for i in range(pad_arr_size)]
 def update_serial_data(que):
-    now_serial_data = ard2que([int(x) for x in serial_port.readline().decode('utf-8').strip().split(',')])
+    serial_data = serial_port.readline().decode('utf-8',"ignore").strip().split(',')
+    if(len(serial_data) != pad_arr_size):
+        return
+    now_serial_data = ard2que([int(x) for x in serial_data])
     for i in range(pad_arr_size):
         if now_serial_data[i] == 1 and last_serial_data[i] == 0:
             que[i] = True
         last_serial_data[i] = now_serial_data[i]
-        
+
 
 while True:
     window_surface.fill(bg_color)
