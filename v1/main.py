@@ -1,4 +1,3 @@
-DEVICE_NAME = '/dev/tty.usbmodem14101'
 
 import pygame
 import sys
@@ -6,6 +5,13 @@ from pygame.locals import *
 from pydub import AudioSegment
 from pydub.playback import play
 import serial
+
+## serial config ##
+DEVICE_NAME = '/dev/ttyACM0'
+if sys.argv[1] == 'windows':
+    DEVICE_NAME = 'COM3'
+serial_port =  serial.Serial(DEVICE_NAME, 9600),
+
 
 def terminate():
     pygame.quit()
@@ -57,7 +63,6 @@ pad_values = {
     "rim": pad_value_max,
     "m": [pad_value_max, pad_value_max, pad_value_max, pad_value_max, pad_value_max]   
 }
-# serial_port =  serial.Serial(DEVICE_NAME, 9600),
 
 def on_parse_keys(event, que):
     if event.key == K_1:
@@ -134,7 +139,9 @@ def update_ui():
     pad_values["rim"] = pad_values["rim"] - n
     if pad_values["rim"] < 0:
         pad_values["rim"] = 0
-    
+def read_serial(que):
+
+
                
 
 while True:
@@ -142,35 +149,35 @@ while True:
     text = font.render("Press 1-5, a, s, d to play sound", True, text_color)
     window_surface.blit(text, (10, 120))
 
-
+    que = {
+        "ki": False,
+        "hi": False,
+        "rim": False,
+        "m": {
+            "1": False,
+            "2": False,
+            "3": False,
+            "4": False,
+            "5": False,
+        }
+    }
 
     for event in pygame.event.get():
         if event.type == QUIT:
             terminate()
-        que = {
-            "ki": False,
-            "hi": False,
-            "rim": False,
-            "m": {
-                "1": False,
-                "2": False,
-                "3": False,
-                "4": False,
-                "5": False,
-            }
-        }
+
 
         # from keyboard        
         if event.type == KEYDOWN:
             que = on_parse_keys(event, que)
                 
         # from arduino
+        
 
-
-        # update ui based on que
-        update_value(que)
-        # player
-        player(que)
+    # update ui based on que
+    update_value(que)
+    # player
+    player(que)
 
     update_ui()
 
