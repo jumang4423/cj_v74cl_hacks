@@ -125,9 +125,29 @@ def update_ui():
         if pad_values[i] < 0:
             pad_values[i] = 0
 
+def ard2que(ard):
+    # ard: 1,2,3,4,5,6,7,8,9,*,0,#
+    # que: 0,1,2,3,4,5,6,7,8,9,*,#
+    que = [False for i in range(pad_arr_size)]
+    que[1] = ard[0]
+    que[2] = ard[1]
+    que[3] = ard[2]
+    que[4] = ard[3]
+    que[5] = ard[4]
+    que[6] = ard[5]
+    que[7] = ard[6]
+    que[8] = ard[7]
+    que[9] = ard[8]
+    que[10] = ard[9]
+    que[0] = ard[10]
+    que[11] = ard[11]
+    return que
+
+    
+
 last_serial_data = [0 for i in range(pad_arr_size)]
 def update_serial_data(que):
-    now_serial_data = [int(i) for i in serial_port.readline().decode().strip().split(',')]
+    now_serial_data = ard2que([int(i) for i in serial_port.readline().decode().strip().split(',')])
     for i in range(pad_arr_size):
         if now_serial_data[i] == 1 and last_serial_data[i] == 0:
             que[i] = True
