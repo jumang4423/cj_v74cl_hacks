@@ -1,12 +1,11 @@
 
 import pygame
 import sys
-import random
 from pygame.locals import *
 from pydub import AudioSegment
 from pydub.playback import play
 import serial
-import time
+
 ## serial config ##
 DEVICE_NAME = ''
 serial_port = None
