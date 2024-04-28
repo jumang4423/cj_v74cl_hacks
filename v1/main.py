@@ -14,7 +14,7 @@ if len(sys.argv) > 1:
     if sys.argv[1] == 'windows':
         DEVICE_NAME = 'COM3'
     if sys.argv[1] == 'mac':
-        DEVICE_NAME = '/dev/tty.ACM0'
+        DEVICE_NAME = '/dev/tty.usbmodem11101'
 if DEVICE_NAME != '':
     serial_port =  serial.Serial(DEVICE_NAME, 9600)
 
@@ -29,7 +29,7 @@ def terminate():
 pad_arr_size = 12
 block_size = 100
 max_col = 6
-audioSettings = {"frequency": 44100, "size": -16, "channels": 2, "buffer": 256}
+audioSettings = {"frequency": 44100, "size": -16, "channels": 2, "buffer": 64}
 system_fps = 120.0
 pygame.mixer.pre_init(
     audioSettings["frequency"],
@@ -147,7 +147,7 @@ def ard2que(ard):
 
 last_serial_data = [0 for i in range(pad_arr_size)]
 def update_serial_data(que):
-    now_serial_data = ard2que([int(i) for i in serial_port.readline().decode().strip().split(',')])
+    now_serial_data = ard2que([int(x) for x in serial_port.readline().decode('utf-8').strip().split(',')])
     for i in range(pad_arr_size):
         if now_serial_data[i] == 1 and last_serial_data[i] == 0:
             que[i] = True
@@ -170,9 +170,9 @@ while True:
         if event.type == KEYDOWN:
             que = on_parse_keys(event, que)
                 
-    update_value(que)
     if serial_port:
-        update_serial_data()
+        update_serial_data(que)
+    update_value(que)
     player(que)
     update_ui()
 
