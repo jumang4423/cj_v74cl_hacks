@@ -126,6 +126,7 @@ def update_ui():
         if pad_values[i] < 0:
             pad_values[i] = 0
 
+
 def ard2que(ard):
     # ard: 1,2,3,4,5,6,7,8,9,*,0,#
     # que: 0,1,2,3,4,5,6,7,8,9,*,#
@@ -142,6 +143,10 @@ def ard2que(ard):
     que[10] = ard[9]
     que[0] = ard[10]
     que[11] = ard[11]
+    
+    # flip 0 and 1
+    for i in range(pad_arr_size):
+        que[i] = not que[i]
     return que
 
     
@@ -149,6 +154,7 @@ def ard2que(ard):
 last_serial_data = [0 for i in range(pad_arr_size)]
 def update_serial_data(que):
     serial_data = serial_port.readline().decode('utf-8',"ignore").strip().split(',')
+    print(serial_data)
     if(len(serial_data) != pad_arr_size):
         return
     now_serial_data = ard2que([int(x) for x in serial_data])
