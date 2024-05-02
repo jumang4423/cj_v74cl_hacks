@@ -1,4 +1,3 @@
-
 import pygame
 import sys
 from pygame.locals import *
@@ -7,24 +6,23 @@ from pydub.playback import play
 import serial
 
 ## serial config ##
-DEVICE_NAME = ''
+DEVICE_NAME = ""
 serial_port = None
 if len(sys.argv) > 1:
-    if sys.argv[1] == 'windows':
-        DEVICE_NAME = 'COM3'
-    if sys.argv[1] == 'mac':
-        DEVICE_NAME = '/dev/tty.usbmodem11101'
-    if sys.argv[1] == 'linux':
-        DEVICE_NAME = '/dev/ttyACM0'
-if DEVICE_NAME != '':
-    serial_port =  serial.Serial(DEVICE_NAME, 9600)
+    if sys.argv[1] == "windows":
+        DEVICE_NAME = "COM4"
+    if sys.argv[1] == "mac":
+        DEVICE_NAME = "/dev/tty.usbmodem11101"
+    if sys.argv[1] == "linux":
+        DEVICE_NAME = "/dev/ttyACM0"
+if DEVICE_NAME != "":
+    serial_port = serial.Serial(DEVICE_NAME, 9600)
 
 
 def terminate():
     pygame.quit()
     sys.exit()
-    
-    
+
 
 # init pygame
 pad_arr_size = 12
@@ -50,6 +48,8 @@ window_surface = pygame.display.set_mode(
 font = pygame.font.SysFont(None, 30)
 bg_color = (255, 255, 255)
 text_color = (10, 10, 10)
+
+
 # 0,1,2,3,4,5,6,7,8,9,*,#
 def load_sounds():
     arr = []
@@ -63,9 +63,11 @@ def load_sounds():
             print(f"Error: sounds/m{i}.wav not found")
     return arr
 
+
 s_m = load_sounds()
 pad_value_max = 255
 pad_values = [pad_value_max for i in range(pad_arr_size)]
+
 
 def on_parse_keys(event, que):
     if event.key == K_1:
@@ -94,10 +96,12 @@ def on_parse_keys(event, que):
         que[11] = True
     return que
 
+
 def player(que):
     for i in range(pad_arr_size):
         if que[i] and s_m[i]:
             s_m[i].play()
+
 
 def update_value(que):
     for i in range(pad_arr_size):
@@ -110,15 +114,21 @@ def draw_rect_alpha(surface, color, rect):
     pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
     surface.blit(shape_surf, rect)
 
+
 def gen_rbga(color, alpha):
     return (color[0], color[1], color[2], alpha)
+
 
 def update_ui():
     for i in range(pad_arr_size // max_col):
         for j in range(max_col):
             idx = i * max_col + j
-            draw_rect_alpha(window_surface, gen_rbga(text_color, pad_values[idx]), (j * block_size, i * block_size, block_size, block_size))
-        
+            draw_rect_alpha(
+                window_surface,
+                gen_rbga(text_color, pad_values[idx]),
+                (j * block_size, i * block_size, block_size, block_size),
+            )
+
     # reduce value by n
     n = 8
     for i in range(pad_arr_size):
@@ -143,18 +153,21 @@ def ard2que(ard):
     que[10] = ard[9]
     que[0] = ard[10]
     que[11] = ard[11]
-    
+
     # flip 0 and 1
     for i in range(pad_arr_size):
         que[i] = not que[i]
     return que
 
-    
 
 last_serial_data = [0 for i in range(pad_arr_size)]
+
+
 def update_serial_data(que):
-    serial_data = serial_port.readline().decode('utf-8',"ignore").strip().split(',')
-    if(len(serial_data) != pad_arr_size):
+    if not serial_port.in_waiting > 0:
+        return
+    serial_data = serial_port.readline().decode("utf-8", "ignore").strip().split(",")
+    if len(serial_data) != pad_arr_size:
         return
     now_serial_data = ard2que([int(x) for x in serial_data])
     for i in range(pad_arr_size):
@@ -174,11 +187,10 @@ while True:
         if event.type == QUIT:
             terminate()
 
-
-        # from keyboard        
+        # from keyboard
         if event.type == KEYDOWN:
             que = on_parse_keys(event, que)
-                
+
     if serial_port:
         update_serial_data(que)
     update_value(que)

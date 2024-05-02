@@ -54,4 +54,5 @@ void loop()
     }
     digitalWrite(writePins[i],HIGH);
   }
+  delay(16);
 }
