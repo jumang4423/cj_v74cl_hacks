@@ -154,6 +154,7 @@ def ard2que(ard):
 last_serial_data = [0 for i in range(pad_arr_size)]
 def update_serial_data(que):
     serial_data = serial_port.readline().decode('utf-8',"ignore").strip().split(',')
+    print(serial_data)
     if(len(serial_data) != pad_arr_size):
         return
     now_serial_data = ard2que([int(x) for x in serial_data])
